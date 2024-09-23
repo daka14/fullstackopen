@@ -1,0 +1,33 @@
+p,
+li {
+    color: red;
+   
+}
+html { font-family: "Sofadi One", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    background-color: #548abd;
+}
+
+h1 {
+    font-size: 60px;
+    text-align: center;
+    margin: 0;
+  padding: 20px 0;
+  color: #548abd;
+  text-shadow: 3px 3px 1px black;
+}
+
+body {
+    width: 600px;
+    margin: 0 auto;
+    background-color: #4ec2ca;
+    padding: 0 20px 20px 20px;
+    border: 5px solid black;
+}
+
+.logo {
+    display:block;
+    margin: 0 auto
+}
+    
