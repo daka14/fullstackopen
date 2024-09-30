@@ -13,12 +13,32 @@
     <h1>Captor</h1>
     <img src="images/svart_logga.png" alt="Captor logo" class="logo"/>
     <p>At Captor we're a local community of</p>
-    <ul>
+    <div class="daniels">
+    <ul class="myList">
         <li>technologists</li>
         <li>thinkers</li>
         <li>builders</li>
     </ul>
+    </div>
     <p>working together. Read more at <a href="https://captor.se/vilka-vi-ar">Captor's</a> homepage.</p>
-
+    <form action="/my-handling-form-page" method="post">
+        <p>
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="user_name" />
+        </p>
+        <p>
+          <label for="mail">Email:</label>
+          <input type="email" id="mail" name="user_email" />
+        </p>
+        <p>
+          <label for="msg">Message:</label>
+          <textarea id="msg" name="user_message"></textarea>
+        </p>
+        <p class="button">
+            <button type="submit">Send your message</button>
+        </p>
+          
+      </form>
+      
   </body>
 </html>
