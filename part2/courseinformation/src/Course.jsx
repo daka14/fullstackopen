@@ -3,23 +3,23 @@
 const Header = (props) =>  (<h1>{props.header}</h1> )
 
 const Part = (props) =>{
-    return (<li>
+    return (<div>
         {props.part.name} {props.part.exercises}
-        </li>)
+        </div>)
 }
 
 const Sum = (props) => {
 
-    console.log(props)
+    const sum = props.content.reduce((sum, part) => (sum + part.exercises), 0)
+    return (<div><b>Total of {sum} exercises</b></div>)
 }
 
 const Content = (props) =>{
-    console.log(props)
     const result = props.content.map(part => <Part key={part.id} part={part} />)
     return (<div>
-        <ul>
+        
             {result}
-        </ul>
+        
         </div>)
 
 }
