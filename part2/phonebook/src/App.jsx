@@ -1,34 +1,31 @@
 /* eslint-disable no-unused-vars */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 const Person = (person) => {
-  return (<li>{person.person.name} {person.person.number}</li>)
-
   
+  return (<div>{person.person.name} {person.person.number}</div>)
 }
 
-const Filter = (filter) => {
-  return(<div>
+const Filter = (props) => {
+  return (<div>
     filter: <input 
-    value={filter.newFilter}
-    onChange={filter.handleNewFilter}
-    />
+    value={props.newFilter}
+    onChange={props.handleNewFilter}/>
   </div>)
 }
 
-const PersonForm = (person) =>{
-  return( <form onSubmit={person.addName}>
+const PersonForm = (props) => {
+  return (<form onSubmit={props.addName}>
     <div>
       name: <input 
-      value={person.newName}
-      onChange={person.handleNewName}
-      />
+      value={props.newName}
+      onChange={props.handleNewName}/>
     </div>
     <div>
       number: <input 
-      value={person.newNumber}
-      onChange={person.handleNewNumber}
-      />
+      value={props.newNumber}
+      onChange={props.handleNewNumber}/>
     </div>
     <div>
 
@@ -37,27 +34,38 @@ const PersonForm = (person) =>{
   </form>)
 }
 
-const Persons = (persons) =>{
-  return (<ul>
-    {persons.persons.map((person) => {if (person.name.toLowerCase().includes(persons.newFilter.toLowerCase()))
-    {return <Person key={person.id} person= {person}/>} }
-    
-    )} 
-    </ul>)
+const Persons = (props) => {
+  return (<div>
+    {props.persons.map((person) => {
+      if (person.name.toLowerCase().includes(props.newFilter.toLowerCase())){
+    return(<Person key={person.id} person= {person}  />)}
+    })} 
+    </div>)
 }
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', 
-      id:1,
-    number: '040-123456' }
-  ]) 
+  const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
 
+  useEffect(() =>{
+    axios
+    .get('http://localhost:3001/persons')
+    .then(response => {
+      setPersons(response.data)
+    })
+  }, [])
+
+
   const addName = (event) => {
     event.preventDefault()
+    if (persons.map(person => person.name).includes(newName)){
+      alert(`${newName} is already in phonebook`)
+      setNewName('')
+      setNewNumber('')
+    }
+    else{
     const personObject = {
       name: newName,
       number: newNumber,
@@ -80,10 +88,12 @@ const App = () => {
     
     setNewName(event.target.value)
   }
+
   const handleNewNumber = (event) => {
     
     setNewNumber(event.target.value)
   }
+
   const handleNewFilter = (event) => {
     
     setNewFilter(event.target.value)
@@ -92,15 +102,21 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Filter newFilter={newFilter} handleNewFilter={handleNewFilter} />
-      <h3>Add New</h3>
-      <PersonForm addName={addName} 
-      newName={newName} 
-      handleNewName={handleNewName} 
-      newNumber={newNumber} 
-      handleNewNumber={handleNewNumber} />
-      <h2>Numbers</h2>
-      <Persons persons={persons} newFilter={newFilter} />
+      <Filter 
+        newFilter={newFilter} 
+        handleNewFilter={handleNewFilter} 
+      />
+      <h3>Add new</h3>  
+      <PersonForm addName= {addName} 
+        newName={newName} 
+        handleNewName= {handleNewName}
+        newNumber={newNumber}
+        handleNewNumber={handleNewNumber} 
+      />
+      <h3>Numbers</h3>
+      <Persons persons={persons}
+        newFilter={newFilter} 
+      />
     </div>
   )
 }
