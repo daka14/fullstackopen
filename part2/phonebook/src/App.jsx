@@ -1,10 +1,12 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import personsService from './services/persons'
 
-const Person = (person) => {
+
+const Person = ({person, deletePerson}) => {
   
-  return (<div>{person.person.name} {person.person.number}</div>)
+  return (<div>{person.name} {person.number} <button onClick={() => deletePerson(person)}>Delete</button> </div>)
 }
 
 const Filter = (props) => {
@@ -35,10 +37,11 @@ const PersonForm = (props) => {
 }
 
 const Persons = (props) => {
+
   return (<div>
     {props.persons.map((person) => {
       if (person.name.toLowerCase().includes(props.newFilter.toLowerCase())){
-    return(<Person key={person.id} person= {person}  />)}
+    return(<Person key={person.id} person= {person}  deletePerson={props.deletePerson}/>)}
     })} 
     </div>)
 }
@@ -50,20 +53,35 @@ const App = () => {
   const [newFilter, setNewFilter] = useState('')
 
   useEffect(() =>{
-    axios
-    .get('http://localhost:3001/persons')
-    .then(response => {
-      setPersons(response.data)
+    personsService
+    .getAll()
+    .then(allPersons => {     
+      setPersons(allPersons)
     })
   }, [])
 
 
   const addName = (event) => {
     event.preventDefault()
-    if (persons.map(person => person.name).includes(newName)){
-      alert(`${newName} is already in phonebook`)
-      setNewName('')
-      setNewNumber('')
+    if (persons.map(person => person.name.includes(newName)))
+      {
+      if (confirm(`${newName} is already added to phonebook, replace old number with a new one?`))
+      {
+        const personObject = persons.pop(newName)
+        personObject.number=newNumber
+        personsService
+        .update(personObject.id,personObject)
+        .then(updatedPerson => {
+          setPersons(persons.concat(updatedPerson))
+        })
+        setNewName('')
+        setNewNumber('')
+      }
+      else
+      {
+        setNewName('')
+        setNewNumber('')
+      }
     }
     else{
     const personObject = {
@@ -71,16 +89,26 @@ const App = () => {
       number: newNumber,
       id: String(persons.length +1)
     }
-    const names = persons.map(person => person.name)
-    if (names.includes(newName)){
-      alert(`${newName} already added to phonebook`)
-      setNewName('')
-      setNewNumber('')
-    }
-    else{
-    setPersons(persons.concat(personObject))
-    setNewName('')
-    setNewNumber('')
+    
+    personsService
+      .create(personObject)
+      .then(allPersons =>{
+        setPersons(persons.concat(allPersons))
+        setNewName('')
+        setNewNumber('')
+      })
+    } 
+  }
+
+  const deletePerson = (person) => {
+    console.log(person)
+    if (confirm(`Delete ${person.name} ?`)){
+    personsService
+    .remove(person.id)
+    .then(removedPerson => {
+      const reducedPersons = persons.filter((person) => person.id !== removedPerson.id)
+      setPersons(reducedPersons)
+    })
   }
   }
 
@@ -98,7 +126,7 @@ const App = () => {
     
     setNewFilter(event.target.value)
   }
-
+  
   return (
     <div>
       <h2>Phonebook</h2>
@@ -116,9 +144,11 @@ const App = () => {
       <h3>Numbers</h3>
       <Persons persons={persons}
         newFilter={newFilter} 
+        deletePerson={deletePerson}
       />
     </div>
   )
 }
+
 
 export default App
