@@ -36,7 +36,7 @@ const App = (props) => {
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(true)
-  const [errorMessage, setErrorMessage] = useState('some error happened...')
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {    
     noteService
@@ -88,13 +88,19 @@ const App = (props) => {
         setNotes(notes.filter(n => n.id !== id))
       })
   }
+  const notesToShow = showAll    ? notes    : notes.filter(note => note.important === true)
 
   return (
     <div>
       <h1>Notes</h1>
       <Notification message={errorMessage} />
+      <div>        
+        <button onClick={() => setShowAll(!showAll)}>          
+        show {showAll ? 'important' : 'all'}        
+        </button>      
+      </div>
       <ul>
-        {notes.map(note => 
+        {notesToShow.map(note => 
           <Note 
           key={note.id} 
           note={note} 
