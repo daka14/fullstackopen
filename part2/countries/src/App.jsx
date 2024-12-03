@@ -1,8 +1,9 @@
+/* eslint-disable react/prop-types */
 import { useState, useEffect } from 'react'
 import countriesService from './services/countries'
 
 const Country = ({country}) => {
-  console.log(country)
+
   return (<div>
     <h1>{country.name.common}</h1>
     <p>
@@ -29,23 +30,25 @@ const Country = ({country}) => {
   
 }
 
-const AllCountries = ({countries, filter}) =>{
+const AllCountries = ({countries, showCountry}) =>{
   
-  const filteredCountries = countries.filter(country => 
-    country.name.common
-    .toLowerCase().includes(filter.toLowerCase()))
+
   
-  if (filteredCountries.length ===1){
-  return(<Country country={filteredCountries[0]} />)
+  if (countries.length ===1){
+  return(<Country country={countries[0]} />)
     }
-  else if(filteredCountries.length <= 10){
-    return (filteredCountries.map(country => 
-      <div key={country.ccn3}> <ShortCountry country={country} /></div>))
+  else if(countries.length <= 10){
+    return (countries.map(country => 
+      <div key={country.ccn3}> <ShortCountry country={country} showCountry={() => showCountry(country.ccn3) } /></div>))
+
   }
 }
 
-const ShortCountry =({country}) =>{
-  return (<div>{country.name.common}</div>)
+const ShortCountry =({country, showCountry}) =>{
+
+  return (<div>{country.name.common} 
+  <button onClick={showCountry}>show</button>
+  </div>)
 }
 
 const Filter = (props) => {
@@ -58,19 +61,34 @@ const Filter = (props) => {
 
 const App = () => {
   const [countries, setCountries] = useState(null)
+  const [selectedCountries, setSelectedCountries] = useState(null)
   const [newFilter, setNewFilter] = useState('')
+
+  const showCountry = ccn3 =>{
+
+    const filteredCountry = countries.filter(country => country.ccn3===ccn3)
+    setSelectedCountries(filteredCountry)
+   
+   
+  }
 
   useEffect(() => {    
     countriesService
     .getAll() 
     .then(initialCountries => {            
-      setCountries(initialCountries)      
+      setCountries(initialCountries) 
+      setSelectedCountries(initialCountries)     
   })  
   }, [])  
     
-  const handleNewFilter = (event) => {
-    
+  const handleNewFilter = (event) => {  
+
     setNewFilter(event.target.value)
+    const filteredCountries = countries.filter(country => 
+      country.name.common
+      .toLowerCase().includes(event.target.value.toLowerCase()))
+    setSelectedCountries(filteredCountries)
+   
   }  
   
   if (countries){
@@ -83,7 +101,7 @@ const App = () => {
         handleNewFilter={handleNewFilter} 
       />
       
-      <AllCountries countries={countries} filter={newFilter} />
+      <AllCountries countries={selectedCountries} filter={handleNewFilter} showCountry={showCountry}/>
         
         
         </div>

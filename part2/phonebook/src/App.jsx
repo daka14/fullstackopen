@@ -172,7 +172,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Notification message={message} messageType={messageType}/>
-      <ul></ul>
+      
       <Filter 
         newFilter={newFilter} 
         handleNewFilter={handleNewFilter} 
